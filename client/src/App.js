@@ -6,7 +6,7 @@ const SUPER_HEROES = gql`
 query GetHeroes {
 	users {
 		id
-		name
+		nickname
 		superpowers {
 			id
 			text
@@ -18,13 +18,14 @@ query GetHeroes {
 function Heroes() {
 	const { loading, error, data } = useQuery(SUPER_HEROES);
 
-	if (loading) return <p>Loading...</p>;
-	if (error) return <p>Error :(</p>;
+	if (loading) return <h1 className="loading">Loading...</h1>;
+	if (error) return <h1 className="error">Something went wrong!</h1>;
+	if (!data) return <h1 className="empty">Not Found</h1>;
 
-	return data.users.map(({ id, name }) => (
-		<div key={name}>
+	return data.users.map(({nickname}) => (
+		<div className="sups__item" key={nickname}>
 			<p>
-				{id}: {name}
+				{nickname}
 			</p>
 		</div>
 	));
@@ -33,7 +34,6 @@ function Heroes() {
 
 const App = () => (
 	<div>
-		<p>Hello!</p>
 		<Heroes />
 	</div>
 );

@@ -1,7 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { ApolloClient, InMemoryCache, gql, ApolloProvider } from '@apollo/client';
-import App from './App'
+import App from './App';
+import './styles/App.scss';
 
 const client = new ApolloClient({
 	// To create the Apollo client we just need a link to the server 
@@ -16,10 +17,16 @@ client
 	query GetHeroes {
 		users {
 			id
-			name
+			nickname
 			superpowers {
 				id
 				text
+			}
+			origin_description
+			catch_phrase
+			images {
+				id
+				url
 			}
 		}
 	}

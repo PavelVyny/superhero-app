@@ -1,0 +1,37 @@
+
+html {
+	box-sizing: border-box;
+	font-size: 10px;
+}
+
+  *, *:before, *:after {
+	box-sizing: inherit;
+}
+body {
+    font-size: 1.4rem;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+	margin: unset;
+}
+
+input, button, submit {
+	border: none;
+}
+button:focus {
+	outline: none;
+}
+
+// variables
+
+
+
+//custom
+
+.sups {
+    &__item {
+        padding: 15px;
+        margin: 10px;
+        background-color: navajowhite;
+    }
+}
