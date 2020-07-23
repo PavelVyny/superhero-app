@@ -1,6 +1,10 @@
 //	Pulls in the required objects for starting an Apollo server
 // and parsing our query strings into query documents for GraphQL.
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql } = require('apollo-server-express');
+const express = require('express');
+// We use the cors package because we want to
+// be able to make requests from other origins.
+const cors = require('cors');
 
 // adding GraphQL Schema.
 const typeDefs = gql`
@@ -9,7 +13,7 @@ const typeDefs = gql`
 	nickname: String
 	real_name: String
 	origin_description: String
-	superpowers: [Superpower]!
+	superpowers: [Superpower]
 	catch_phrase: String
 	images: [Image]
   }
@@ -29,7 +33,14 @@ const typeDefs = gql`
 	user(id: ID!): User
   }
   type Mutation {
-    createUser(text: String!):String
+    createUser(
+		nickname: String!,
+		real_name: String!,
+		origin_description: String!,
+		superpowers: String,
+		catch_phrase: String,
+		):String
+
     removeUSer(id: String!):String
   }
 `;
@@ -80,7 +91,12 @@ const resolvers = {
 
 			return users.push({
 				id: users.length,
-				nickname: 'test nickname'
+				nickname: args.nickname,
+				real_name: args.real_name,
+				origin_description: args.origin_description,
+				superpowers: args.superpowers,
+				catch_phrase: args.catch_phrase,
+
 			})
 		}
 	}
@@ -93,8 +109,13 @@ const server = new ApolloServer({
 	resolvers,
 });
 
+const app = express();
+server.applyMiddleware({ app });
+
+app.use(cors());
+
 
 // start listening for connections
-server.listen().then(({ url }) => {
-	console.log(`Apollo server started at ${url}`)
-});
+app.listen({ port: 4000 }, () =>
+	console.log('Now browse to http://localhost:4000' + server.graphqlPath)
+);

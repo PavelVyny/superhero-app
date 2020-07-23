@@ -18,6 +18,7 @@ client
 		users {
 			id
 			nickname
+			real_name
 			superpowers {
 				id
 				text
