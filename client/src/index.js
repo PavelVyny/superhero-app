@@ -20,7 +20,6 @@ client
 			nickname
 			real_name
 			superpowers {
-				id
 				text
 			}
 			origin_description
