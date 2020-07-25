@@ -20,7 +20,7 @@ const READ_HEROES = gql`
 function Heroes() {
 	const { loading, error, data } = useQuery(READ_HEROES);
 
-	
+
 
 	if (loading) return <h1 className="loading">Loading...</h1>;
 	if (error) return <h1 className="error">Something went wrong!</h1>;
@@ -29,11 +29,21 @@ function Heroes() {
 
 	return (
 		<div className="sups">
-		<AddUser/>
+			<AddUser />
 			<ul>
 				{data.users.map((user) =>
 					<li key={user.id} className="sups__item">
 						<span className="sups__nickname">{user.nickname}</span>
+
+						<ul>
+							<h4>Superpowers:</h4>
+							{user.superpowers.length ?
+								user.superpowers.map((power, index) =>
+									<li key={index} className="sups__power">{power.text}</li>
+								)
+								: 'has no powers'
+							}
+						</ul>
 					</li>
 				)}
 			</ul>

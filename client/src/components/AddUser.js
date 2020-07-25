@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
+import PowersInput from './PowersInput';
 
 const AddUser = () => {
 	const CREATE_HERO = gql`
@@ -105,6 +106,7 @@ const AddUser = () => {
 					>
 
 					</input>
+					<PowersInput/>
 
 					<button className="new-sup__submit-btn" type="submit">Submit</button>
 				</form>
