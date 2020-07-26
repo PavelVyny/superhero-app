@@ -1,6 +1,6 @@
 import React from 'react'
 import { gql, useQuery } from '@apollo/client';
-import AddUser from './components/AddUser';
+import UserForm from './components/AddUser/UserForm';
 
 
 const READ_HEROES = gql`
@@ -29,7 +29,7 @@ function Heroes() {
 
 	return (
 		<div className="sups">
-			<AddUser />
+			<UserForm />
 			<ul>
 				{data.users.map((user) =>
 					<li key={user.id} className="sups__item">

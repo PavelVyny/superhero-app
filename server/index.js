@@ -8,51 +8,48 @@ const cors = require('cors');
 
 // adding GraphQL Schema.
 const typeDefs = gql`
-  type User {
-	id: ID!
-	nickname: String
-	real_name: String
-	origin_description: String
-	superpowers: [Superpower!]
-	catch_phrase: String
-	images: [Image]
-  }
+	type User {
+		id: ID!
+		nickname: String
+		real_name: String
+		origin_description: String
+		superpowers: [Superpower!]
+		catch_phrase: String
+		images: [Image]
+	}
 
-  type Superpower {
-	text: String
-  }
+	type Superpower {
+		text: String
+	}
 
-  type Image {
-	id: ID!
-	url: String
-  }
+	type Image {
+		id: ID!
+		url: String
+  	}
 
-  type Query {
-	users: [User]
-	user(id: ID!): User
-  }
+  	type Query {
+		users: [User]
+		user(id: ID!): User
+  	}
 
-  input SuperpowerInput {
-	text: String
-  }
+  	input SuperpowerInput {
+		text: String
+  	}
 
-  type Mutation {
-    addUser(
-		nickname: String!,
-		real_name: String,
-		origin_description: String,
-		catch_phrase: String,
-		superpowers: [SuperpowerInput]
-	):String
-	
+  	type Mutation {
+		addUser(
+			nickname: String!,
+			real_name: String,
+			origin_description: String,
+			catch_phrase: String,
+			superpowers: [SuperpowerInput]
+		):String
 
-
-    removeUser(
+	removeUser(
 		id: String!
 	):User
-  }
+  	}
 `;
-
 
 // This will be our mock data to query
 const users = [
@@ -103,9 +100,9 @@ const resolvers = {
 				origin_description: args.origin_description,
 				catch_phrase: args.catch_phrase,
 				superpowers: args.superpowers,
-				
+
 			}
-			
+
 
 			return users.push(newUser)
 		}
