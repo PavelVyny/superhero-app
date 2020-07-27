@@ -5,6 +5,70 @@ const express = require('express');
 // We use the cors package because we want to
 // be able to make requests from other origins.
 const cors = require('cors');
+const lowdb = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const mkdirp = require('mkdirp');
+const shortid = require('shortid');
+const { createWriteStream, unlink } = require('fs');
+
+const {
+	GraphQLUpload, // The GraphQL "Upload" Scalar
+	graphqlUploadExpress, // The Express middleware.
+} = require('graphql-upload');
+
+const UPLOAD_DIR = './uploads';
+const db = lowdb(new FileSync('db.json'));
+
+// Seed an empty DB.
+db.defaults({ uploads: [] }).write();
+
+// Ensure upload directory exists.
+mkdirp.sync(UPLOAD_DIR);
+
+
+/**
+* Stores a GraphQL file upload. The file is stored in the filesystem and its
+* metadata is recorded in the DB.
+* @param {GraphQLUpload} upload GraphQL file upload.
+* @returns {object} File metadata.
+*/
+const storeUpload = async (upload) => {
+	const { createReadStream, filename, mimetype } = await upload;
+	const stream = createReadStream();
+	const id = shortid.generate();
+	const path = `${UPLOAD_DIR}/${id}-${filename}`;
+	const file = { id, filename, mimetype, path };
+
+	// Store the file in the filesystem.
+	await new Promise((resolve, reject) => {
+		// Create a stream to which the upload will be written.
+		const writeStream = createWriteStream(path);
+
+		// When the upload is fully written, resolve the promise.
+		writeStream.on('finish', resolve);
+
+		// If there's an error writing the file, remove the partially written file
+		// and reject the promise.
+		writeStream.on('error', (error) => {
+			unlink(path, () => {
+				reject(error);
+			});
+		});
+
+		// In Node.js <= v13, errors are not automatically propagated between piped
+		// streams. If there is an error receiving the upload, destroy the write
+		// stream with the corresponding error.
+		stream.on('error', (error) => writeStream.destroy(error));
+
+		// Pipe the upload into the write stream.
+		stream.pipe(writeStream);
+	});
+
+	// Record the file metadata in the DB.
+	db.get('uploads').push(file).write();
+
+	return file;
+};
 
 // adding GraphQL Schema.
 const typeDefs = gql`
@@ -15,21 +79,24 @@ const typeDefs = gql`
 		origin_description: String
 		superpowers: [Superpower!]
 		catch_phrase: String
-		images: [Image]
+		files: [File]
 	}
 
 	type Superpower {
 		text: String
 	}
 
-	type Image {
+	type File {
 		id: ID!
-		url: String
-  	}
+		path: String!
+		filename: String!
+		mimetype: String!
+	}
 
   	type Query {
 		users: [User]
 		user(id: ID!): User
+		uploads: [File!]!
   	}
 
   	input SuperpowerInput {
@@ -45,11 +112,87 @@ const typeDefs = gql`
 			superpowers: [SuperpowerInput]
 		):String
 
-	removeUser(
-		id: String!
-	):User
-  	}
+		removeUser(
+			id: String!
+		):User
+
+		multipleUpload(
+			files: [Upload!]!
+		): [File!]!
+
+		}
+		
+		scalar Upload
 `;
+
+// Next up, we need to tell GraphQL how to interpret the queries
+const resolvers = {
+	Query: {
+		users: () => {
+			return users
+		},
+		user: (id) => {
+			return users.find(user => user.id === id);
+		},
+		uploads: (source, args, { db }) =>
+			db.get('uploads').value()
+	},
+	Mutation: {
+		addUser: (parent, args, context, info) => {
+			newUser = {
+				id: users.length + 1,
+				nickname: args.nickname,
+				real_name: args.real_name,
+				origin_description: args.origin_description,
+				catch_phrase: args.catch_phrase,
+				superpowers: args.superpowers,
+
+			}
+			return users.push(newUser)
+		},
+		multipleUpload: async (parent, { files }, { storeUpload }) => {
+			// Ensure an error storing one upload doesn’t prevent storing the rest.
+			const results = await Promise.allSettled(files.map(storeUpload));
+			return results.reduce((storedFiles, { value, reason }) => {
+				if (value) storedFiles.push(value);
+				// Realistically you would do more than just log an error.
+				else console.error(`Failed to store upload: ${reason}`);
+				return storedFiles;
+			}, []);
+		},
+	},
+	Upload: GraphQLUpload,
+};
+
+
+// creating a new instance
+const server = new ApolloServer({
+	// Disable the built in file upload implementation that uses an outdated
+	// `graphql-upload` version, see:
+	// https://github.com/apollographql/apollo-server/issues/3508#issuecomment-662371289	
+	uploads: false,
+	typeDefs,
+	resolvers,
+	context: { db, storeUpload }
+});
+
+const app = express();
+app.use(graphqlUploadExpress());
+server.applyMiddleware({ app });
+
+app.use(cors());
+app.use(
+	'/graphql',
+	graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 })
+);
+
+
+
+// start listening for connections
+app.listen({ port: 4000 }, () =>
+	console.log('Now browse to http://localhost:4000' + server.graphqlPath)
+);
+
 
 // This will be our mock data to query
 const users = [
@@ -79,50 +222,3 @@ const users = [
 		catch_phrase: 'Genius, Billionaire, Playboy, Philanthropist.',
 	}
 ];
-
-
-// Next up, we need to tell GraphQL how to interpret the queries
-const resolvers = {
-	Query: {
-		users: () => {
-			return users
-		},
-		user: (id) => {
-			return users.find(user => user.id === id);
-		},
-	},
-	Mutation: {
-		addUser: (parent, args, context, info) => {
-			newUser = {
-				id: users.length + 1,
-				nickname: args.nickname,
-				real_name: args.real_name,
-				origin_description: args.origin_description,
-				catch_phrase: args.catch_phrase,
-				superpowers: args.superpowers,
-
-			}
-
-
-			return users.push(newUser)
-		}
-	}
-};
-
-
-// creating a new instance
-const server = new ApolloServer({
-	typeDefs,
-	resolvers,
-});
-
-const app = express();
-server.applyMiddleware({ app });
-
-app.use(cors());
-
-
-// start listening for connections
-app.listen({ port: 4000 }, () =>
-	console.log('Now browse to http://localhost:4000' + server.graphqlPath)
-);

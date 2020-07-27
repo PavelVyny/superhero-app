@@ -3,13 +3,21 @@
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
+
+    "nodemonConfig": {
+        "ignore": ["*.json"]
+      },
     "scripts": {
         "start": "nodemon index.js"
     },
     "dependencies": {
         "apollo-server-express": "^2.16.0",
         "cors": "^2.8.5",
-        "graphql": "^15.0.0"
+        "graphql": "^15.0.0",
+        "graphql-upload": "^11.0.0",
+        "lowdb": "^1.0.0",
+        "mkdirp": "^1.0.4",
+        "shortid": "^2.2.15"
     },
     "devDependencies": {
         "nodemon": "^2.0.3"

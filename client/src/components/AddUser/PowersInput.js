@@ -21,22 +21,19 @@ const PowersInput = (props) => {
 		const newlist = [].concat(list)
 		newlist.splice(i, 1);
 		setState(newlist);
-		console.log('work')
 	};
 
 	// handle click event of the Add button
 	const handleAddClick = () => {
 		setState([...listState, { text: '' }]);
 	};
-
-	console.log(props)
 	return (
 		<>
 			<div className="btn" onClick={handleAddClick}>Add a power</div>
 			{listState.map((x, i) => {
 				return (
-					<>
-						<div key={i} className="input-box">
+					<div key={i}>
+						<div  className="input-box">
 							<input
 								name="text"
 								placeholder={'Enter power'}
@@ -51,7 +48,7 @@ const PowersInput = (props) => {
 								Remove
 							</div>
 						</div>
-					</>
+					</div>
 				);
 			})}
 		</>
