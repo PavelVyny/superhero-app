@@ -1,3 +1,22 @@
 {
-  "uploads": []
+  "uploads": [
+    {
+      "id": "vHb9whiVN",
+      "filename": "logo-small-transparent.png",
+      "mimetype": "image/png",
+      "path": "./uploads/vHb9whiVN-logo-small-transparent.png"
+    },
+    {
+      "id": "rXUetFl2f",
+      "filename": "pants-1.jpg",
+      "mimetype": "image/jpeg",
+      "path": "./uploads/rXUetFl2f-pants-1.jpg"
+    },
+    {
+      "id": "jYXeUCR5X",
+      "filename": "logo-small-transparent.png",
+      "mimetype": "image/png",
+      "path": "./uploads/jYXeUCR5X-logo-small-transparent.png"
+    }
+  ]
 }
