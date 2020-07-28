@@ -20,10 +20,6 @@ client
 			}
 			origin_description
 			catch_phrase
-			images {
-				id
-				url
-			}
 		}
 	}
 	`
