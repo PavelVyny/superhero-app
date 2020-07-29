@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import PowersInput from './PowersInput';
+import { UploadFileList } from './UploadFiles/UploadFilesList';
 
 const UserForm = () => {
-
 
 	const CREATE_HERO = gql`
 
@@ -12,21 +12,19 @@ const UserForm = () => {
 		$real_name: String,
 		$origin_description: String,
 		$superpowers: [SuperpowerInput],
-		,
-		) {
+	) {
 		addUser(
 			nickname: $nickname,
 			real_name:$real_name,
 			origin_description: $origin_description,
 			superpowers: $superpowers,
-
-			)
-  }
+		)
+  	}
 `
 	const [addUser] = useMutation(CREATE_HERO);
 
 
-	const [state, setState] = React.useState({
+	const [state, setState] = useState({
 		nickname: '',
 		real_name: '',
 		origin_description: '',
@@ -56,12 +54,6 @@ const UserForm = () => {
 				className="new-sup__form"
 				onSubmit={e => {
 					e.preventDefault();
-					// let powersArray = [];
-					// let powers = document.getElementsByName("superpowers");
-					// powers.forEach(power => {
-
-					// 	powersArray.push({ text: power.value })
-					// });
 					addUser({
 						variables: {
 							nickname: state.nickname,
@@ -104,6 +96,7 @@ const UserForm = () => {
 				</input>
 
 				<PowersInput updatePowers={updatePowers} />
+				<UploadFileList />
 
 				<button className="new-sup__submit-btn" type="submit">Submit</button>
 			</form>

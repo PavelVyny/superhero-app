@@ -11,7 +11,7 @@ const PowersInput = (props) => {
 		const list = [...listState];
 		list[index][name] = value;
 		setState(list);
-		// lifting up powers to parent component
+		// lifting up powers to parent component (UserForm)
 		props.updatePowers(listState)
 	};
 
@@ -21,6 +21,8 @@ const PowersInput = (props) => {
 		const newlist = [].concat(list)
 		newlist.splice(i, 1);
 		setState(newlist);
+		//lifting up new array of powers to the parent (UserForm)
+		props.updatePowers(newlist)
 	};
 
 	// handle click event of the Add button

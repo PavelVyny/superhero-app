@@ -20,6 +20,14 @@ client
 			}
 			origin_description
 			catch_phrase
+			files {
+				userID
+				id
+				filename
+			}
+		}
+		uploads {
+			path
 		}
 	}
 	`

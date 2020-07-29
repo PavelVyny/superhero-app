@@ -10,21 +10,19 @@ const FileSync = require('lowdb/adapters/FileSync');
 const mkdirp = require('mkdirp');
 const shortid = require('shortid');
 const { createWriteStream, unlink } = require('fs');
-
 const {
 	GraphQLUpload, // The GraphQL "Upload" Scalar
 	graphqlUploadExpress, // The Express middleware.
 } = require('graphql-upload');
+
 
 const UPLOAD_DIR = './uploads';
 const db = lowdb(new FileSync('db.json'));
 
 // Seed an empty DB.
 db.defaults({ uploads: [] }).write();
-
 // Ensure upload directory exists.
 mkdirp.sync(UPLOAD_DIR);
-
 
 /**
 * Stores a GraphQL file upload. The file is stored in the filesystem and its
@@ -33,6 +31,7 @@ mkdirp.sync(UPLOAD_DIR);
 * @returns {object} File metadata.
 */
 const storeUpload = async (upload) => {
+	console.log(upload)
 	const { createReadStream, filename, mimetype } = await upload;
 	const stream = createReadStream();
 	const id = shortid.generate();
@@ -88,6 +87,7 @@ const typeDefs = gql`
 
 	type File {
 		id: ID!
+		userID: String
 		path: String!
 		filename: String!
 		mimetype: String!
@@ -140,7 +140,7 @@ const resolvers = {
 	Mutation: {
 		addUser: (parent, args, context, info) => {
 			newUser = {
-				id: users.length + 1,
+				id: `${shortid.generate()}_${args.nickname}`,
 				nickname: args.nickname,
 				real_name: args.real_name,
 				origin_description: args.origin_description,
@@ -154,10 +154,14 @@ const resolvers = {
 			// Ensure an error storing one upload doesn’t prevent storing the rest.
 			const results = await Promise.allSettled(files.map(storeUpload));
 			return results.reduce((storedFiles, { value, reason }) => {
-				if (value) storedFiles.push(value);
+				if (value) {
+					storedFiles.push(value);
+				}
+					
 				// Realistically you would do more than just log an error.
 				else console.error(`Failed to store upload: ${reason}`);
 				return storedFiles;
+				
 			}, []);
 		},
 	},
