@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useApolloClient } from '@apollo/client';
 import PowersInput from './PowersInput';
 import { UploadFileList } from './UploadFiles/UploadFilesList';
 
@@ -18,7 +18,13 @@ const UserForm = () => {
 			real_name:$real_name,
 			origin_description: $origin_description,
 			superpowers: $superpowers,
-		)
+		) {
+			user {
+				id
+				nickname
+				real_name
+			}
+		  }
   	}
 `
 	const [addUser] = useMutation(CREATE_HERO);
@@ -29,6 +35,7 @@ const UserForm = () => {
 		real_name: '',
 		origin_description: '',
 		superpowers: [],
+		files: []
 
 	})
 
@@ -39,7 +46,7 @@ const UserForm = () => {
 			[e.target.name]: value
 		});
 	}
-	// take state with powers from child component
+	// taking state from child component
 	const updatePowers = (value) => {
 		setState({
 			...state,
@@ -47,12 +54,36 @@ const UserForm = () => {
 		})
 	}
 
+	const updateFiles = (value) => {
+		setState({
+			...state,
+			'files': value
+		})
+	}
+
+
+	const MULTIPLE_UPLOAD_MUTATION = gql`
+	mutation multipleUpload($files: [Upload!]!
+	  ) {
+	  multipleUpload(
+		  files: $files
+	  ) {
+		id
+	  }
+	}
+  `;
+	const [multipleUploadMutation] = useMutation(MULTIPLE_UPLOAD_MUTATION);
+	const apolloClient = useApolloClient();
+
+
+
 	return (
 		<div className="new-sup">
 			<h3>Create New superhero</h3>
 			<form
 				className="new-sup__form"
 				onSubmit={e => {
+					const files = state.files
 					e.preventDefault();
 					addUser({
 						variables: {
@@ -60,9 +91,14 @@ const UserForm = () => {
 							real_name: state.real_name,
 							origin_description: state.origin_description,
 							superpowers: state.superpowers,
-
 						}
 					});
+
+					multipleUploadMutation({ variables: { files } }).then(() => {
+						apolloClient.resetStore();
+					});
+
+
 				}}>
 				<input
 					className="form-control"
@@ -96,7 +132,7 @@ const UserForm = () => {
 				</input>
 
 				<PowersInput updatePowers={updatePowers} />
-				<UploadFileList />
+				<UploadFileList updateFiles={updateFiles} />
 
 				<button className="new-sup__submit-btn" type="submit">Submit</button>
 			</form>

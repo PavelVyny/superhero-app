@@ -3,10 +3,11 @@
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
-
     "nodemonConfig": {
-        "ignore": ["*.json"]
-      },
+        "ignore": [
+            "*.json"
+        ]
+    },
     "scripts": {
         "start": "nodemon index.js"
     },

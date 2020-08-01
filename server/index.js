@@ -1,6 +1,6 @@
 //	Pulls in the required objects for starting an Apollo server
 // and parsing our query strings into query documents for GraphQL.
-const { ApolloServer, gql } = require('apollo-server-express');
+const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
 // We use the cors package because we want to
 // be able to make requests from other origins.
@@ -10,6 +10,7 @@ const FileSync = require('lowdb/adapters/FileSync');
 const mkdirp = require('mkdirp');
 const shortid = require('shortid');
 const { createWriteStream, unlink } = require('fs');
+const typeDefs = require('./schema');
 const {
 	GraphQLUpload, // The GraphQL "Upload" Scalar
 	graphqlUploadExpress, // The Express middleware.
@@ -31,7 +32,7 @@ mkdirp.sync(UPLOAD_DIR);
 * @returns {object} File metadata.
 */
 const storeUpload = async (upload) => {
-	console.log(upload)
+	// console.log(upload)
 	const { createReadStream, filename, mimetype } = await upload;
 	const stream = createReadStream();
 	const id = shortid.generate();
@@ -69,61 +70,10 @@ const storeUpload = async (upload) => {
 	return file;
 };
 
+
+
 // adding GraphQL Schema.
-const typeDefs = gql`
-	type User {
-		id: ID!
-		nickname: String
-		real_name: String
-		origin_description: String
-		superpowers: [Superpower!]
-		catch_phrase: String
-		files: [File]
-	}
 
-	type Superpower {
-		text: String
-	}
-
-	type File {
-		id: ID!
-		userID: String
-		path: String!
-		filename: String!
-		mimetype: String!
-	}
-
-  	type Query {
-		users: [User]
-		user(id: ID!): User
-		uploads: [File!]!
-  	}
-
-  	input SuperpowerInput {
-		text: String
-  	}
-
-  	type Mutation {
-		addUser(
-			nickname: String!,
-			real_name: String,
-			origin_description: String,
-			catch_phrase: String,
-			superpowers: [SuperpowerInput]
-		):String
-
-		removeUser(
-			id: String!
-		):User
-
-		multipleUpload(
-			files: [Upload!]!
-		): [File!]!
-
-		}
-		
-		scalar Upload
-`;
 
 // Next up, we need to tell GraphQL how to interpret the queries
 const resolvers = {
@@ -148,21 +98,15 @@ const resolvers = {
 				superpowers: args.superpowers,
 
 			}
-			return users.push(newUser)
+			users.push(newUser)
+			return {
+				user: newUser
+			}
 		},
-		multipleUpload: async (parent, { files }, { storeUpload }) => {
+		multipleUpload: (parent, { files }, { storeUpload }) => {
 			// Ensure an error storing one upload doesn’t prevent storing the rest.
-			const results = await Promise.allSettled(files.map(storeUpload));
-			return results.reduce((storedFiles, { value, reason }) => {
-				if (value) {
-					storedFiles.push(value);
-				}
-					
-				// Realistically you would do more than just log an error.
-				else console.error(`Failed to store upload: ${reason}`);
-				return storedFiles;
-				
-			}, []);
+			const results = files.map(storeUpload);
+			return results
 		},
 	},
 	Upload: GraphQLUpload,

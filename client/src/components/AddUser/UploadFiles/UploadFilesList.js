@@ -2,39 +2,37 @@ import React, { useState } from 'react';
 import { useApolloClient, useMutation, gql } from '@apollo/client';
 import { Uploads } from './Uploads';
 
-const MULTIPLE_UPLOAD_MUTATION = gql`
-  mutation multipleUpload($files: [Upload!]!
-	) {
-    multipleUpload(
-		files: $files
-	) {
-      id
-    }
-  }
-`;
 
-export const UploadFileList = () => {
 
-	const [state, setState] = useState([]);
-	const [multipleUploadMutation] = useMutation(MULTIPLE_UPLOAD_MUTATION);
+export const UploadFileList = (props) => {
+
+	const MULTIPLE_UPLOAD_MUTATION = gql`
+	mutation multipleUpload($files: [Upload!]!
+	  ) {
+	  multipleUpload(
+		  files: $files
+	  ) {
+		id
+	  }
+	}
+  `;
+
+	const [filesState, setState] = useState([]);
+	// const [multipleUploadMutation] = useMutation(MULTIPLE_UPLOAD_MUTATION);
 	const apolloClient = useApolloClient();
 
-	const onChange = ({ target: { validity, files } }) =>
-		validity.valid &&
-		multipleUploadMutation({ variables: { files } }).then(() => {
-			const list = [...state];
+	const handleAddFiles = ({ target: { validity, files} }) => {
+		setState({
+			'files': files
+		}, props.updateFiles(files));
+	}
 
-			console.log(Object.values(files))
 
-
-			console.log(files)
-
-			apolloClient.resetStore();
-		});
+	
 
 	return (
 		<div>
-			<input type="file" multiple onChange={onChange} />
+			<input type="file" name="files" multiple required onChange= {handleAddFiles} />
 			<Uploads />
 		</div>
 
