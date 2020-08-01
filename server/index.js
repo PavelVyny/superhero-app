@@ -89,6 +89,7 @@ const resolvers = {
 	},
 	Mutation: {
 		addUser: (parent, args, context, info) => {
+			const storedFiles = args.files.map(storeUpload);
 			newUser = {
 				id: `${shortid.generate()}_${args.nickname}`,
 				nickname: args.nickname,
@@ -96,7 +97,7 @@ const resolvers = {
 				origin_description: args.origin_description,
 				catch_phrase: args.catch_phrase,
 				superpowers: args.superpowers,
-
+				files: storedFiles
 			}
 			users.push(newUser)
 			return {

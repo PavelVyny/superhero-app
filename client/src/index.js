@@ -23,6 +23,7 @@ client
 			files {
 				id
 				filename
+				path
 			}
 		}
 		uploads {

@@ -12,12 +12,14 @@ const UserForm = () => {
 		$real_name: String,
 		$origin_description: String,
 		$superpowers: [SuperpowerInput],
+		$files: [Upload!]!
 	) {
 		addUser(
 			nickname: $nickname,
 			real_name:$real_name,
 			origin_description: $origin_description,
 			superpowers: $superpowers,
+			files: $files,
 		) {
 			user {
 				id
@@ -83,7 +85,7 @@ const UserForm = () => {
 			<form
 				className="new-sup__form"
 				onSubmit={e => {
-					const files = state.files
+					// const files = state.files
 					e.preventDefault();
 					addUser({
 						variables: {
@@ -91,12 +93,13 @@ const UserForm = () => {
 							real_name: state.real_name,
 							origin_description: state.origin_description,
 							superpowers: state.superpowers,
+							files: state.files
 						}
 					});
 
-					multipleUploadMutation({ variables: { files } }).then(() => {
-						apolloClient.resetStore();
-					});
+					// multipleUploadMutation({ variables: { files } }).then(() => {
+					// 	apolloClient.resetStore();
+					// });
 
 
 				}}>

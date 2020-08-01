@@ -43,6 +43,7 @@ const typeDefs = gql`
 			origin_description: String,
 			catch_phrase: String,
 			superpowers: [SuperpowerInput]
+			files: [Upload]
 		):UserUpdateResponse
 
 		removeUser(
