@@ -16,6 +16,7 @@ export const Uploads = () => {
 	const { data: { uploads = [] } = {} } = useQuery(UPLOADS_QUERY);
 
 	return (
+		<>
 		<table>
 			<thead>
 				<tr>
@@ -36,5 +37,11 @@ export const Uploads = () => {
 				))}
 			</tbody>
 		</table>
+		{/*use regexp to replace dot from the start of path to get valid src */}
+		{uploads.map(({ id, filename, mimetype, path }) => (
+					<img key={`${id}_${filename}`} src={path.replace(/^\./g, '')}></img>
+				))}
+		
+		</>
 	);
 };

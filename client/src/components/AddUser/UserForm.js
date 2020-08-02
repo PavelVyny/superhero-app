@@ -63,21 +63,7 @@ const UserForm = () => {
 		})
 	}
 
-
-	const MULTIPLE_UPLOAD_MUTATION = gql`
-	mutation multipleUpload($files: [Upload!]!
-	  ) {
-	  multipleUpload(
-		  files: $files
-	  ) {
-		id
-	  }
-	}
-  `;
-	const [multipleUploadMutation] = useMutation(MULTIPLE_UPLOAD_MUTATION);
 	const apolloClient = useApolloClient();
-
-
 
 	return (
 		<div className="new-sup">
@@ -97,10 +83,7 @@ const UserForm = () => {
 						}
 					});
 
-					// multipleUploadMutation({ variables: { files } }).then(() => {
-					// 	apolloClient.resetStore();
-					// });
-
+					apolloClient.resetStore();
 
 				}}>
 				<input
