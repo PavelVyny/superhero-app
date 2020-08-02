@@ -26,11 +26,6 @@ client
 				path
 			}
 		}
-		uploads {
-			id
-			filename
-			path
-		}
 	}
 	`
 	})

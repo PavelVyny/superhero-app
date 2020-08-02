@@ -33,7 +33,6 @@ export const UploadFileList = (props) => {
 	return (
 		<div>
 			<input type="file" name="files" multiple required onChange= {handleAddFiles} />
-			<Uploads />
 		</div>
 
 	)

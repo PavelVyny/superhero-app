@@ -1,60 +1,15 @@
 import React from 'react'
 import { gql, useQuery } from '@apollo/client';
+import { HeroesList } from './components/HeroesList'
+import { HeroDetailPage } from './components/UserDetailPage'
 import UserForm from './components/AddUser/UserForm';
-
-
-const READ_HEROES = gql`
-	query GetHeroes {
-		users {
-			id
-			nickname
-			real_name
-			superpowers {
-				text
-			}
-		}
-	}
-`;
-
-
-function Heroes() {
-	const { loading, error, data } = useQuery(READ_HEROES);
-
-
-
-	if (loading) return <h1 className="loading">Loading...</h1>;
-	if (error) return <h1 className="error">Something went wrong!</h1>;
-	if (!data) return <h1 className="empty">Not Found</h1>;
-
-
-	return (
-		<div className="sups">
-			<UserForm />
-			<ul>
-				{data.users.map((user) =>
-					<li key={user.id} className="sups__item">
-						<span className="sups__nickname">{user.nickname}</span>
-
-						<ul>
-							<h4>Superpowers:</h4>
-							{user.superpowers.length ?
-								user.superpowers.map((power, index) =>
-									<li key={index} className="sups__power">{power.text}</li>
-								)
-								: 'has no powers'
-							}
-						</ul>
-					</li>
-				)}
-			</ul>
-		</div>
-	);
-}
 
 
 const App = () => (
 	<div>
-		<Heroes />
+		<HeroesList />
+		<UserForm />
+		<HeroDetailPage/>
 	</div>
 );
 

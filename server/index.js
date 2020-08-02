@@ -2,6 +2,7 @@
 // and parsing our query strings into query documents for GraphQL.
 const { ApolloServer } = require('apollo-server-express');
 const express = require('express');
+const path = require('path')
 // We use the cors package because we want to
 // be able to make requests from other origins.
 const cors = require('cors');
@@ -81,8 +82,8 @@ const resolvers = {
 		users: () => {
 			return users
 		},
-		user: (id) => {
-			return users.find(user => user.id === id);
+		user(parent, args, context, info) {
+			return users.find(user => user.id === args.id);
 		},
 		uploads: (source, args, { db }) =>
 			db.get('uploads').value()
@@ -134,7 +135,8 @@ app.use(
 	'/graphql',
 	graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 })
 );
-
+//allow to get /uploads folder 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 
 // start listening for connections
