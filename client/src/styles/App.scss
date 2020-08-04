@@ -46,6 +46,10 @@ button:focus {
 			border: 1px solid green;
 			width: 50%;
 			line-height: 3rem;
+			&_child {
+				width: 100%;
+				margin: 0;
+			}
 		}
 	}
 	&__submit-btn {
@@ -61,8 +65,22 @@ button:focus {
 
 .input-box {
 	display: flex;
+	width: 50%;
+	position: relative;
+	margin: 5px;
 }
-.btn {
+.add-btn {
+	cursor: pointer;
+	width: 100px;
+	height: 20px;
+	border: 1px solid black;
+	margin: 5px;
+}
+.remove-btn {
+	position: absolute;
+	top: 50%;
+    right: -10px;
+    transform: translate(100%, -50%);
 	cursor: pointer;
 	width: 100px;
 	height: 20px;

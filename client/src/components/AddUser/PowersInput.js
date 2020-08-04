@@ -31,24 +31,22 @@ const PowersInput = (props) => {
 	};
 	return (
 		<>
-			<div className="btn" onClick={handleAddClick}>Add a power</div>
+			<div className="add-btn" onClick={handleAddClick}>Add a power</div>
 			{listState.map((x, i) => {
 				return (
-					<div key={i}>
-						<div  className="input-box">
-							<input
-								name="text"
-								placeholder={'Enter power'}
-								value={x.text}
-								onChange={e => handleInputChange(e, i)}
-							/>
-
-							<div
-								className="btn"
-								onClick={() => handleRemoveClick(i)}
-							>
-								Remove
-							</div>
+					<div key={i} className="input-box">
+						<input
+							className="form-control form-control_child"
+							name="text"
+							placeholder={'Enter power'}
+							value={x.text}
+							onChange={e => handleInputChange(e, i)}
+						/>
+						<div
+							className="remove-btn"
+							onClick={() => handleRemoveClick(i)}
+						>
+							Remove
 						</div>
 					</div>
 				);
