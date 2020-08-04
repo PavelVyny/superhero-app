@@ -39,7 +39,12 @@ export const Uploads = () => {
 		</table>
 		{/*use regexp to replace dot from the start of path to get valid src */}
 		{uploads.map(({ id, filename, mimetype, path }) => (
-					<img key={`${id}_${filename}`} src={path.replace(/^\./g, '')}></img>
+					<img 
+					key={`${id}_${filename}`} 
+					src={path.replace(/^\./g, '')}
+					alt=""
+					>
+					</img>
 				))}
 		
 		</>
